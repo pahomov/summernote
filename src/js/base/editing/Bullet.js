@@ -31,7 +31,7 @@ export default class Bullet {
     $.each(clustereds, (idx, paras) => {
       const head = lists.head(paras);
       if (dom.isLi(head)) {
-        this.wrapList(paras, head.parentNode.nodeName);
+        this.wrapList(paras, head.parentNode.nodeName, head.previousSibling);
       } else {
         $.each(paras, (idx, para) => {
           $(para).css('marginLeft', (idx, val) => {
@@ -114,14 +114,17 @@ export default class Bullet {
    * @param {String} listName
    * @return {Node[]}
    */
-  wrapList(paras, listName) {
+  wrapList(paras, listName, prevListItem) {
     const head = lists.head(paras);
     const last = lists.last(paras);
 
     const prevList = dom.isList(head.previousSibling) && head.previousSibling;
     const nextList = dom.isList(last.nextSibling) && last.nextSibling;
 
-    const listNode = prevList || dom.insertAfter(dom.create(listName || 'UL'), last);
+    const listNode = prevList ||
+      prevListItem
+      ? prevListItem.appendChild(dom.create(listName || 'UL'), last)
+      : dom.insertAfter(dom.create(listName || 'UL'), last);
 
     // P to LI
     paras = paras.map((para) => {
